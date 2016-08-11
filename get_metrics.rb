@@ -54,9 +54,12 @@ puts "  #{organization['name']}"
 
 hosts = api.get_json(hosts_url)['hosts']
 puts "\nHosts:"
-hosts.each {|host| puts "  #{host['name']}, id: #{host['id']}" }
+hosts.map! {|host| { name: host['name'], id: host['id'] } }
+hosts.each { |host| puts "  #{host[:name]}" }
 
-print 'Host id: '
-metrics = api.get_json(metric_names_url(STDIN.gets.chomp))
+print 'Host name: '
+host_name = STDIN.gets.chomp
+host_id = hosts.find { |host| host[:name] == host_name }[:id]
+metrics = api.get_json(metric_names_url(host_id))
 puts "\nMetrics:"
 metrics['names'].each {|metric| puts "  #{metric}" }
