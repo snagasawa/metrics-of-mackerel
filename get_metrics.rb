@@ -50,13 +50,13 @@ api = API.new(STDIN.gets.chomp)
 
 organization = api.get_json(organization_url)
 puts "Organization:"
-puts "  name: #{organization['name']}"
+puts "  #{organization['name']}"
 
 hosts = api.get_json(hosts_url)['hosts']
 puts "\nHosts:"
-hosts.each {|host| puts "  name: #{host['name']}, id: #{host['id']}" }
+hosts.each {|host| puts "  #{host['name']}, id: #{host['id']}" }
 
 print 'Host id: '
 metrics = api.get_json(metric_names_url(STDIN.gets.chomp))
 puts "\nMetrics:"
-metrics['names'].each {|metric| puts "  name: #{metric}" }
+metrics['names'].each {|metric| puts "  #{metric}" }
