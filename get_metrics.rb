@@ -37,9 +37,17 @@ def organization_url
   URI.parse("#{MACKEREL_API_LOCATION}/org")
 end
 
+def hosts_url
+  URI.parse("#{MACKEREL_API_LOCATION}/hosts")
+end
+
 print 'Api Key: '
 api = API.new(STDIN.gets.chomp)
 
 organization = api.get_json(organization_url)
 puts "Organization:"
 puts "  name: #{organization['name']}"
+
+hosts = api.get_json(hosts_url)['hosts']
+puts "\nHosts:"
+hosts.each {|host| puts "  name: #{host['name']}, id: #{host['id']}" }
