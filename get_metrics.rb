@@ -49,7 +49,7 @@ print 'Api Key: '
 api = API.new(STDIN.gets.chomp)
 
 organization = api.get_json(organization_url)
-puts "Organization:"
+puts "\nOrganization:"
 puts "  #{organization['name']}"
 
 hosts = api.get_json(hosts_url)['hosts']
@@ -57,7 +57,7 @@ puts "\nHosts:"
 hosts.map! {|host| { name: host['name'], id: host['id'] } }
 hosts.each { |host| puts "  #{host[:name]}" }
 
-print 'Host name: '
+print "\nHost name: "
 host_name = STDIN.gets.chomp
 host_id = hosts.find { |host| host[:name] == host_name }[:id]
 metrics = api.get_json(metric_names_url(host_id))
