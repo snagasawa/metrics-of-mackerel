@@ -41,6 +41,10 @@ def hosts_url
   URI.parse("#{MACKEREL_API_LOCATION}/hosts")
 end
 
+def metric_names_url(host_id)
+  URI.parse("#{MACKEREL_API_LOCATION}/hosts/#{host_id}/metric-names")
+end
+
 print 'Api Key: '
 api = API.new(STDIN.gets.chomp)
 
@@ -51,3 +55,8 @@ puts "  name: #{organization['name']}"
 hosts = api.get_json(hosts_url)['hosts']
 puts "\nHosts:"
 hosts.each {|host| puts "  name: #{host['name']}, id: #{host['id']}" }
+
+print 'Host id: '
+metrics = api.get_json(metric_names_url(STDIN.gets.chomp))
+puts "\nMetrics:"
+metrics['names'].each {|metric| puts "  name: #{metric}" }
