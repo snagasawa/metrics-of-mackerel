@@ -1,6 +1,7 @@
 #!/bin/ruby
 require 'net/http'
 require 'json'
+require 'time'
 
 MACKEREL_API_LOCATION = 'https://mackerel.io/api/v0'.freeze
 
@@ -45,6 +46,10 @@ def metric_names_url(host_id)
   URI.parse("#{MACKEREL_API_LOCATION}/hosts/#{host_id}/metric-names")
 end
 
+def metric_url(host_id, metric_name, first_day, last_day)
+  URI.parse("#{MACKEREL_API_LOCATION}/hosts/#{host_id}/metrics\?name\=#{metric_name}\&from\=#{first_day}\&to\=#{last_day}")
+end
+
 print 'Api Key: '
 api = API.new(STDIN.gets.chomp)
 
@@ -63,3 +68,14 @@ host_id = hosts.find { |host| host[:name] == host_name }[:id]
 metrics = api.get_json(metric_names_url(host_id))
 puts "\nMetrics:"
 metrics['names'].each {|metric| puts "  #{metric}" }
+
+print "\nMetric Name: "
+metric_name = STDIN.gets.chomp
+print 'First Day(YYYY-MM-DD): '
+first_day = Time.parse(STDIN.gets.chomp).to_i
+print 'Last Day(YYYY-MM-DD): '
+last_day = Time.parse(STDIN.gets.chomp).to_i
+
+url_for_metric = metric_url(host_id, metric_name, first_day, last_day)
+metric_values = api.get_json(url_for_metric)
+puts metric_values
