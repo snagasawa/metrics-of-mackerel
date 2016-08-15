@@ -45,6 +45,8 @@ sum=$(echo $metric_values | jq '.metrics | map(.value) | add')
 count=$(echo $metric_values | jq '.metrics | length')
 max=$(echo $metric_values | jq '.metrics | map(.value) | max')
 average=$(echo $metric_values | jq '.metrics | map(.value) | length as $metric_length | add / $metric_length')
+from_time=$(date -r $(echo $metric_values | jq '.metrics[0] | .time') +"%Y/%m/%d %H:%M:%S")
+to_time=$(date -r $(echo $metric_values | jq '.metrics[-1] | .time') +"%Y/%m/%d %H:%M:%S")
 
 cat << EOS
 
@@ -52,6 +54,8 @@ Results:
   Metric Name: $metric_name
   Average: $average
   Max: $max
+  From: $from_time
+  To: $to_time
   Sum: $sum
   Count: $count
 EOS
@@ -59,8 +63,8 @@ EOS
 # Export to CSV
 converted_host_name=$(echo $host_name | sed -e 's/\./_/g')
 file_name="${converted_host_name}_$(date +%s).csv"
-echo 'MetricName,Average,Max,Sum,Count' >> $file_name
-echo "$metric_name,$average,$max,$sum,$count" >> $file_name
+echo 'MetricName,Average,Max,From,To,Sum,Count' >> $file_name
+echo "$metric_name,$average,$max,$from_time,$to_time,$sum,$count" >> $file_name
 
 if [ -e $file_name ]; then
     echo "\nExported results to $file_name."
