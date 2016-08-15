@@ -26,3 +26,32 @@ metric_names_url="https://mackerel.io/api/v0/hosts/${host_id}/metric-names"
 metrics=`get_json ${api_key} ${metric_names_url}`
 echo "\nMetrics: "
 echo ${metrics} | jq -r '.names[]'
+
+# Get metric values
+printf "\nMetric Name: "
+read metric_name
+printf "First Day(YYYYMMDD): "
+read first_day
+first_day=`date -j -f %Y%m%d ${first_day} +%s`
+printf "Last Day(YYYYMMDD): "
+read last_day
+last_day=`date -j -f %Y%m%d ${last_day} +%s`
+
+# メソッドで呼び出すと、なぜか400 bad requestになり値が取れない
+# metric_url="https://mackerel.io/api/v0/hosts/${host_id}/metrics\?name\=${metric_name}\&from\=${first_day}\&to\=${last_day}"
+# metric_values=`get_json ${api_key} ${metric_url}`
+metric_values=`curl -s -X GET -H "X-Api-Key: ${api_key}" https://mackerel.io/api/v0/hosts/${host_id}/metrics\?name\=${metric_name}\&from\=${first_day}\&to\=${last_day}`
+sum=`echo ${metric_values} | jq '.metrics | map(.value) | add'`
+count=`echo ${metric_values} | jq '.metrics | length'`
+max=`echo ${metric_values} | jq '.metrics | map(.value) | max'`
+average=`echo ${metric_values} | jq '.metrics | map(.value) | length as $metric_length | add / $metric_length'`
+
+cat << EOS
+
+Results:
+  Metric Name: ${metric_name}
+  Sum: ${sum}
+  Count: ${count}
+  Average: ${average}
+  Max: ${max}
+EOS
