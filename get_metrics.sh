@@ -55,3 +55,15 @@ Results:
   Average: ${average}
   Max: ${max}
 EOS
+
+# Export to CSV
+converted_host_name=$(echo $host_name | sed -e 's/\./_/g')
+file_name="${converted_host_name}_$(date +%s).csv"
+echo 'MetricName,Average,Max,Sum,Count' >> $file_name
+echo "$metric_name,$average,$max,$sum,$count" >> $file_name
+
+if [ -e $file_name ]; then
+    echo "\nExported results to $file_name."
+else
+    echo "\nFailed to export to file."
+fi
